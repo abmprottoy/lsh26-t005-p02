@@ -1,0 +1,83 @@
+{
+  "team_id": "LSH26-T005",
+  "problem_id": "P02",
+  "repository_name": "lsh26-t005-p02",
+  "live_url": "https://lsh26-t005-p02-frontend.tahsinhasib.workers.dev",
+  "demo_video_url_optional": "",
+  "event_start_code": "LSH26-8490-C900",
+  "repository_created_before_release": false,
+  "pre_event_materials": [],
+  "sample_data": {
+    "loads_published_fixture": true,
+    "method": "Import data accepts either the published multi-case JSON wrapper or one individual case, then loads the selected case through the Worker API.",
+    "reset_instructions": "Open Import data and choose Reset to demo data to restore the 46-medicine demonstration stock list."
+  },
+  "problem_solving_method": "The team separated expiry calculations from presentation, computes each medicine's status and value from an explicit effective date, and keeps returned stock outside every active count and value. A Hono Worker and D1 provide the stock API while React renders the operational dashboard, import workflow, reports, and responsive interface.",
+  "requirements": {
+    "R1": {
+      "status": "complete",
+      "evidence": "Stock page; backend/seed.sql; backend/src/lib/demoData.ts; GET /api/medicines. The resettable demonstration data contains 46 medicines with name, batch, quantity, unit purchase price, and expiry date."
+    },
+    "R2": {
+      "status": "complete",
+      "evidence": "Overview page; backend/src/lib/grouping.ts; GET /api/dashboard. Active stock is grouped into expired, 0-30 days inclusive, 31-90 days, and safe using the current or imported effective date."
+    },
+    "R3": {
+      "status": "complete",
+      "evidence": "Stock and Returned pages; POST /api/medicines/:id/return and /unreturn. Returned items leave active counts and values and can be restored."
+    },
+    "R4": {
+      "status": "complete",
+      "evidence": "Overview risk banner and dashboard group values; backend/src/index.ts. Value at risk is expired value plus the 0-30-day group, with each item valued as quantity multiplied by unit_price_bdt."
+    }
+  },
+  "team_members": [
+    {
+      "registered_name": "Ammar Bin Mahmud",
+      "github_username": "abmprottoy",
+      "major_contribution": "Team lead; coordinated the two-project submission, preserved the P02 history under the submitting account, audited live-guide compliance, and finalized judging documentation.",
+      "evidence_paths_or_commits": [
+        "README.md",
+        "evaluation-manifest.json"
+      ]
+    },
+    {
+      "registered_name": "Md. Tahsin Hasib",
+      "github_username": "tahsinhasib",
+      "major_contribution": "Primary P02 engineer; implemented the Hono and D1 backend, expiry and risk calculations, returned-stock workflow, React dashboard, data import, reporting, responsive UI, and Cloudflare deployments.",
+      "evidence_paths_or_commits": [
+        "backend/",
+        "frontend/",
+        "5e1d90be299ea6bbbe1a37ba7983e83fee2a0959",
+        "6fe4f438ce634297c79201f9a98e181f9e3002e3"
+      ]
+    }
+  ],
+  "major_design_decisions": [
+    "Compute expiry groups from an effective date on every request instead of storing a status that can become stale.",
+    "Treat returned stock as explicit state and exclude it from every active count and value while allowing undo.",
+    "Use quantity multiplied by unit purchase price for all taka values and define value at risk as expired plus the 0-30-day group.",
+    "Keep the React frontend and Hono/D1 backend separately deployable while exposing typed API helpers in the client.",
+    "Let judges import the published multi-case wrapper, select one case, and reset the database to deterministic demo data."
+  ],
+  "known_limitations": [
+    "The API has no authentication; import and demo reset replace the shared stock data for every visitor.",
+    "The backend permits cross-origin requests from any origin.",
+    "The repository has no committed automated test suite; verification relies on TypeScript and production builds, direct API probes, and manual fixture imports.",
+    "The production frontend and API remain deployed in the original contributor's Cloudflare account."
+  ],
+  "ai_tools_used": [
+    {
+      "tool": "Anthropic Claude",
+      "used_for": "Implementation and iterative feature work recorded in the agents workflow and changelog.",
+      "how_output_was_verified": "Reviewed through the committed change history, successful frontend and Worker builds, direct API checks, and manual interaction with the deployed application."
+    },
+    {
+      "tool": "OpenAI Codex",
+      "used_for": "Final submission audit, manifest conversion, contribution evidence, documentation, and release verification.",
+      "how_output_was_verified": "Checked against the live submission guide, the v2.2 manifest template, the preserved Git history, package builds, and deployed endpoints."
+    }
+  ],
+  "licenses_file": "LICENSES.md",
+  "declaration": "The information above is complete and truthful to the best of the team's knowledge."
+}

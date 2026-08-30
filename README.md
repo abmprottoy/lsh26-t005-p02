@@ -4,8 +4,35 @@
 
 A neighbourhood pharmacy loses money when medicine expires unnoticed on a shelf. MediTrack gives the pharmacist one screen that shows what's expiring, when, and how much taka is at risk — computed live from today's date, not from stale numbers someone typed in once.
 
-**Live app:** https://lsh26-t005-p02-frontend.tahsinhasib.workers.dev
-**Live API:** https://backend.tahsinhasib.workers.dev
+## Project information
+
+- **Team:** Automagic
+- **Team ID:** LSH26-T005
+- **Problem:** P02 — Pharmacy Expiry Shelf Check
+- **Repository:** <https://github.com/abmprottoy/lsh26-t005-p02>
+- **Live application:** <https://lsh26-t005-p02-frontend.tahsinhasib.workers.dev>
+- **Live API:** <https://backend.tahsinhasib.workers.dev>
+- **Demo video:** Not supplied
+
+> Judges evaluate only the exact 40-character commit SHA entered in the Final Submission Form.
+
+## Requirement proof
+
+| Requirement | Status | Where to verify |
+| --- | --- | --- |
+| R1 — Maintain a pharmacy stock list with the required medicine fields | Complete | **Stock** page, `backend/seed.sql`, `backend/src/lib/demoData.ts`, and `GET /api/medicines`. Reset restores 46 medicines. |
+| R2 — Group active stock by expiry urgency | Complete | **Overview** and `backend/src/lib/grouping.ts`: expired, 0–30 days inclusive, 31–90 days, and safe are calculated from the effective date. |
+| R3 — Mark stock returned and remove it from active totals | Complete | **Stock** → **Mark returned**, the separate **Returned** page, and the return/unreturn API routes. |
+| R4 — Calculate taka value at risk | Complete | **Overview** risk banner and `GET /api/dashboard`; item value is quantity × unit purchase price, and risk is expired plus 0–30-day value. |
+
+## How judges can verify it
+
+1. Open the live application. The Overview should show 46 active medicines after a demo reset.
+2. Confirm the four expiry groups and the value-at-risk banner.
+3. Open **Stock**, mark one medicine returned, and confirm it leaves active totals and appears under **Returned**.
+4. Use **Undo** on the Returned page and confirm it returns to active stock.
+5. Open **Import data** to load the published JSON wrapper or one case. Select the desired case before importing.
+6. Choose **Reset to demo data** when finished to restore the 46-medicine demonstration set.
 
 ## What it does
 
@@ -81,7 +108,7 @@ Full request examples live in `backend/bruno/` — open that folder in the [Brun
 
 ```bash
 cd backend
-npm install
+npm ci
 npx wrangler login                          # first time only
 npx wrangler d1 create lsh26-t005-p02-db     # copy the returned database_id into wrangler.jsonc
 npx wrangler d1 execute lsh26-t005-p02-db --local --file=./migrations/0002_medicines.sql
@@ -101,11 +128,25 @@ npm run deploy
 
 ```bash
 cd frontend
-npm install
+npm ci
 npm run dev          # http://localhost:5173
 ```
 
 Local dev points at `http://localhost:8787` via `frontend/.env.development.local` (gitignored, dev-only). Production build falls back to the deployed backend URL if `VITE_API_URL` isn't set.
+
+### Verification
+
+```bash
+cd backend
+npm run cf-typegen
+npm run typecheck
+
+cd ../frontend
+npm run lint
+npm run build
+```
+
+The frontend linter currently reports one non-blocking immutability warning in the hand-built donut-chart accumulator. The production build and TypeScript checks complete successfully.
 
 ## Secrets
 
@@ -119,3 +160,41 @@ Never commit real secrets. `.env`, `.env.local`, `.dev.vars` are gitignored in b
 ## Licenses
 
 See [`LICENSES.md`](LICENSES.md) for the full list of third-party dependencies and their licenses.
+
+## Problem-solving approach
+
+The implementation keeps time-sensitive expiry logic explicit: each item is classified from the current or imported effective date instead of storing a status that can become stale. The Worker returns computed days remaining, group, and stock value, while React renders the operational workflow without duplicating the rules. Returned inventory remains stored for auditability but is excluded from every active total.
+
+## Major design decisions
+
+- **Live classification:** expiry groups are recalculated from dates on every request.
+- **Clarification-aligned value:** every taka value uses quantity multiplied by unit purchase price; value at risk includes expired and 0–30-day stock only.
+- **Reversible return workflow:** marking returned removes an item from active figures without deleting its record.
+- **Judge-controlled data:** Import data accepts the published wrapper or one case and allows a reset to the demonstration inventory.
+- **Separate deploys:** the React frontend and Hono/D1 backend can be deployed and diagnosed independently.
+
+## Team contributions
+
+| Registered member | GitHub username | Major contribution | Evidence |
+| --- | --- | --- | --- |
+| Ammar Bin Mahmud | `abmprottoy` | Team lead; submission coordination, history-preserving repository transfer, compliance review, and final judging documentation | `README.md`, `evaluation-manifest.json` |
+| Md. Tahsin Hasib | `tahsinhasib` | Primary P02 implementation: backend, D1 model, expiry and value calculations, return workflow, frontend, charts, reports, import workflow, responsive UI, and deployment | `backend/`, `frontend/`, commits `5e1d90b` and `6fe4f43` |
+
+Commit count alone does not represent contribution. The original 16 implementation commits remain attributed to Tahsin's declared GitHub identity.
+
+## AI usage
+
+Anthropic Claude assisted the implementation and iterative feature workflow recorded under `agents/`. OpenAI Codex assisted the final submission audit, v2.2 manifest conversion, contribution evidence, documentation, and release verification. The outputs were checked through review of the preserved history, TypeScript and production builds, direct API probes, and the deployed application.
+
+## Known limitations
+
+- The API has no authentication; import and demo reset replace the shared production stock data.
+- The backend currently accepts cross-origin requests from any origin.
+- There is no committed automated test suite; verification uses TypeScript/build checks, direct API probes, and manual fixture imports.
+- The live frontend and API remain deployed in Tahsin's Cloudflare account.
+
+## Repository records
+
+- [`EVENT.md`](EVENT.md) — event start code and pre-event-material declaration
+- [`evaluation-manifest.json`](evaluation-manifest.json) — structured requirement and contribution evidence
+- [`LICENSES.md`](LICENSES.md) — dependencies, assets, and AI disclosure

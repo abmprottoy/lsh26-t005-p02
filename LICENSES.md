@@ -10,6 +10,8 @@ Below are the open-source third-party packages the project depends on, and their
 | --- | --- | --- |
 | [hono](https://github.com/honojs/hono) | ^4.13.5 | MIT |
 | [wrangler](https://github.com/cloudflare/workers-sdk) | ^4.110.0 | MIT OR Apache-2.0 |
+| [typescript](https://github.com/microsoft/TypeScript) | ^7.0.2 | Apache-2.0 |
+| [@types/node](https://github.com/DefinitelyTyped/DefinitelyTyped) | ^26.4.0 | MIT |
 
 ## Frontend (`frontend/`)
 
@@ -41,3 +43,10 @@ Below are the open-source third-party packages the project depends on, and their
 - Every listed license (MIT, Apache-2.0, SIL OFL 1.1) permits the use made of it here — production use in a hackathon submission, no attribution requirements beyond what's listed in this file.
 - `wrangler` appears in both `backend/` and `frontend/` as separate installs at slightly different pinned versions; both are dual MIT/Apache-2.0 licensed by Cloudflare.
 - This list was compiled from each package's own declared `license` field at the versions actually installed (`npm ls`), not just the `package.json` version ranges.
+
+## AI-assisted development disclosure
+
+- **Anthropic Claude** assisted implementation and iterative feature work recorded in `agents/CHANGELOG.md` and `agents/FEATURES.md`.
+- **OpenAI Codex** assisted the final submission audit, v2.2 manifest conversion, contribution documentation, and release verification.
+
+AI-generated or AI-assisted work was reviewed against the supplied P02 rules and clarifications, the preserved Git history, successful TypeScript and production builds, direct API probes, and manual interaction with the deployed application. No AI service credential is stored in this repository.
