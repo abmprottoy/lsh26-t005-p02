@@ -1,2 +1,5 @@
 # local instruction queue — not pushed
 agents/instructions/
+
+# judges' test/answer data — not pushed
+agents/P02_pharmacy_expiry_public.json
