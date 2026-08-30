@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
-import { IconAlert, IconBox, IconGrid, IconPill, IconReport, IconUndo, IconUpload } from './icons'
+import { IconAlert, IconBox, IconGrid, IconHelp, IconPill, IconReport, IconUndo, IconUpload } from './icons'
 
-export type View = 'overview' | 'stock' | 'returned' | 'data' | 'reports'
+export type View = 'overview' | 'stock' | 'returned' | 'data' | 'reports' | 'help'
 
 export function Sidebar({
   view,
@@ -26,6 +26,8 @@ export function Sidebar({
     { key: 'data', label: 'Import data', icon: <IconUpload /> },
     { key: 'reports', label: 'Reports', icon: <IconReport /> },
   ]
+
+  const supportItems: { key: View; label: string; icon: ReactNode }[] = [{ key: 'help', label: 'Help & Guide', icon: <IconHelp /> }]
 
   function renderItem(item: { key: View; label: string; icon: ReactNode; badge?: number }) {
     return (
@@ -69,6 +71,11 @@ export function Sidebar({
         <div className="nav-group">
           <div className="nav-group-label">Tools</div>
           <nav className="nav">{toolItems.map(renderItem)}</nav>
+        </div>
+
+        <div className="nav-group">
+          <div className="nav-group-label">Support</div>
+          <nav className="nav">{supportItems.map(renderItem)}</nav>
         </div>
 
         <div className="sidebar-footer">

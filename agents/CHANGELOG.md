@@ -2,6 +2,18 @@
 
 Chronological log of changes made to this project. Newest first.
 
+## 2026-08-30 (Center Help page, add "Try it" buttons)
+
+- Centered the Help & Guide content (`.help-page { margin: 0 auto }`) instead of it sitting flush left on wide screens.
+- Added a "Try it" button (pill, matching the app's button language) at the end of every section's content that navigates straight to the relevant page — "How grouping works" → Overview, and one each for Overview/Stock/Returned/Import data/Reports. `HelpPage` now takes an `onNavigate` prop wired to `App.tsx`'s `setView`.
+- Deployed: https://lsh26-t005-p02-frontend.tahsinhasib.workers.dev
+
+## 2026-08-30 (Help & Guide page)
+
+- New sidebar item **Help & Guide** (`frontend/src/components/HelpPage.tsx`), written for a first-time user with zero context: what MediTrack is, how the expiry grouping actually works (with a worked date example), and a walkthrough of every page — Overview, Stock (with numbered steps for search/filter/mark-returned/quick-add/pagination), Returned, Import data (including the "this replaces everything" warning), and Reports — plus a Tips & FAQ section answering the most likely first questions (stock list looks different, what the status dot means, why a group changed on its own).
+- Built as collapsible `<details>` sections (native HTML disclosure, no JS state) with a jump-link row at the top, styled to match the rest of the app (same card/icon/chevron language used elsewhere).
+- Deployed: https://lsh26-t005-p02-frontend.tahsinhasib.workers.dev
+
 ## 2026-08-30 (Mark returned / Undo as styled pill buttons)
 
 - Replaced the plain text-link "Mark returned" / "Undo" action in the stock table with proper pill buttons (`.btn-pill`) — icon + label, tinted background instead of bare text, hover and press states, matching the design system's existing badge/chip color language. "Mark returned" uses the primary green treatment, "Undo" a neutral ghost style.

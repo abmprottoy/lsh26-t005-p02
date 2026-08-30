@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import './App.css'
 import { DataTools } from './components/DataTools'
 import { Dropdown } from './components/Dropdown'
+import { HelpPage } from './components/HelpPage'
 import { MedicineTable } from './components/MedicineTable'
 import { Overview } from './components/Overview'
 import { QuickAddModal } from './components/QuickAddModal'
@@ -27,6 +28,7 @@ const PAGE_COPY: Record<View, { title: string; subtitle: string }> = {
   returned: { title: 'Returned to distributor', subtitle: 'Items pulled off the shelf and sent back — excluded from active totals.' },
   data: { title: 'Import data', subtitle: 'Load a test file to check the app against it, or reset back to the demo stock list.' },
   reports: { title: 'Reports', subtitle: 'Generate a print-ready stock expiry report.' },
+  help: { title: 'Help & Guide', subtitle: 'New here? A walkthrough of every screen, with examples.' },
 }
 
 function App() {
@@ -134,6 +136,8 @@ function App() {
           {view === 'data' && <DataTools onChanged={reload} />}
 
           {view === 'reports' && <ReportsPage />}
+
+          {view === 'help' && <HelpPage onNavigate={setView} />}
 
           {(view === 'stock' || view === 'returned') && (
             <>

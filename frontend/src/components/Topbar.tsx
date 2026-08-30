@@ -8,6 +8,7 @@ const VIEW_LABEL: Record<View, string> = {
   returned: 'Returned',
   data: 'Import data',
   reports: 'Reports',
+  help: 'Help & Guide',
 }
 
 export function Topbar({
