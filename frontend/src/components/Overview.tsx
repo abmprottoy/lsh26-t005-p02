@@ -1,12 +1,19 @@
-import { useMemo } from 'react'
+import { useMemo, type ComponentType } from 'react'
 import type { Dashboard, Group } from '../lib/api'
-import { IconAlert } from './icons'
+import { IconAlert, IconCalendar, IconCheck, IconClock } from './icons'
 
 const GROUP_LABEL: Record<Group, string> = {
   expired: 'Expired',
   within30: 'Expiring ≤ 30 days',
   within90: 'Expiring ≤ 90 days',
   safe: 'Safe',
+}
+
+const GROUP_ICON: Record<Group, ComponentType<{ size?: number }>> = {
+  expired: IconAlert,
+  within30: IconClock,
+  within90: IconCalendar,
+  safe: IconCheck,
 }
 
 function taka(value: number): string {
@@ -27,6 +34,11 @@ export function Overview({
     return dashboard.groups.expired.value + dashboard.groups.within30.value
   }, [dashboard])
 
+  const totalItems = useMemo(() => {
+    if (!dashboard) return 0
+    return Object.values(dashboard.groups).reduce((sum, g) => sum + g.count, 0)
+  }, [dashboard])
+
   const maxChartValue = useMemo(() => {
     if (!dashboard) return 1
     return Math.max(1, ...dashboard.chart.map((c) => c.value))
@@ -36,30 +48,43 @@ export function Overview({
     <>
       <section className="risk-banner">
         <span className="risk-icon">
-          <IconAlert size={20} />
+          <IconAlert size={22} />
         </span>
         <div>
           <div className="risk-value">{taka(totalAtRisk)}</div>
           <div className="risk-label">at risk right now — expired stock plus what expires within 30 days</div>
         </div>
+        <div className="risk-meta">
+          <div className="risk-meta-value">{totalItems}</div>
+          <div className="risk-meta-label">active SKUs tracked</div>
+        </div>
       </section>
 
       <section className="cards">
-        {(['expired', 'within30', 'within90', 'safe'] as Group[]).map((g) => (
-          <button
-            key={g}
-            className={`card card-${g} ${activeGroup === g ? 'card-active' : ''}`}
-            onClick={() => onSelectGroup(g)}
-          >
-            <span className="card-label">{GROUP_LABEL[g]}</span>
-            <span className="card-count">{dashboard?.groups[g].count ?? 0}</span>
-            <span className="card-value">{taka(dashboard?.groups[g].value ?? 0)}</span>
-          </button>
-        ))}
+        {(['expired', 'within30', 'within90', 'safe'] as Group[]).map((g) => {
+          const Icon = GROUP_ICON[g]
+          return (
+            <button
+              key={g}
+              className={`card card-${g} ${activeGroup === g ? 'card-active' : ''}`}
+              onClick={() => onSelectGroup(g)}
+            >
+              <span className={`card-icon card-icon-${g}`}>
+                <Icon size={17} />
+              </span>
+              <span className="card-label">{GROUP_LABEL[g]}</span>
+              <span className="card-count">{dashboard?.groups[g].count ?? 0}</span>
+              <span className="card-value">{taka(dashboard?.groups[g].value ?? 0)}</span>
+            </button>
+          )
+        })}
       </section>
 
       <section className="chart">
-        <h2>Value at risk, next 6 months</h2>
+        <div className="chart-head">
+          <h2>Value at risk, next 6 months</h2>
+          <span className="chart-hint">Excludes already-expired stock</span>
+        </div>
         <div className="chart-bars">
           {dashboard?.chart.map((c) => (
             <div className="chart-bar-wrap" key={c.month}>

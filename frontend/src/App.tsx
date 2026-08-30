@@ -4,7 +4,8 @@ import { MedicineTable } from './components/MedicineTable'
 import { Overview } from './components/Overview'
 import { QuickAddModal } from './components/QuickAddModal'
 import { Sidebar, type View } from './components/Sidebar'
-import { IconPlus, IconSearch } from './components/icons'
+import { Topbar } from './components/Topbar'
+import { IconPlus } from './components/icons'
 import {
   checkHealth,
   fetchCompanies,
@@ -68,6 +69,11 @@ function App() {
     setView('stock')
   }
 
+  function handleGlobalSearch(value: string) {
+    setSearch(value)
+    if (value && view === 'overview') setView('stock')
+  }
+
   const pageTitle = view === 'overview' ? 'Overview' : view === 'stock' ? 'Active stock' : 'Returned to distributor'
   const pageSubtitle =
     view === 'overview'
@@ -89,63 +95,67 @@ function App() {
         returnedCount={dashboard?.returnedCount ?? 0}
       />
 
-      <main className="main">
-        <header className="page-header">
-          <div>
-            <h1>{pageTitle}</h1>
-            <p className="subtitle">
-              {pageSubtitle} <span className="as-of">As of {dashboard?.today ?? '…'}</span>
-            </p>
-          </div>
-          {view !== 'overview' && (
-            <button className="primary" onClick={() => setShowAdd(true)}>
-              <IconPlus size={16} />
-              Quick add
-            </button>
-          )}
-        </header>
+      <div className="content-col">
+        <Topbar
+          view={view}
+          today={dashboard?.today ?? '…'}
+          expiredCount={dashboard?.groups.expired.count ?? 0}
+          searchValue={search}
+          onSearch={handleGlobalSearch}
+        />
 
-        {view === 'overview' && <Overview dashboard={dashboard} onSelectGroup={goToStock} activeGroup={groupFilter} />}
-
-        {(view === 'stock' || view === 'returned') && (
-          <>
-            {view === 'stock' && (
-              <section className="toolbar">
-                <div className="search-field">
-                  <IconSearch size={16} />
-                  <input
-                    className="search"
-                    placeholder="Search by medicine name…"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                  />
-                </div>
-                <select value={company} onChange={(e) => setCompany(e.target.value)}>
-                  <option value="">All companies</option>
-                  {companies.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </select>
-                {groupFilter && (
-                  <button className="chip" onClick={() => setGroupFilter('')}>
-                    Group: {groupFilter} ✕
-                  </button>
-                )}
-              </section>
+        <main className="main">
+          <header className="page-header">
+            <div>
+              <h1>{pageTitle}</h1>
+              <p className="subtitle">{pageSubtitle}</p>
+            </div>
+            {view !== 'overview' && (
+              <button className="primary" onClick={() => setShowAdd(true)}>
+                <IconPlus size={16} />
+                Quick add
+              </button>
             )}
+          </header>
 
-            <MedicineTable
-              items={items}
-              loading={loading}
-              mode={view === 'stock' ? 'active' : 'returned'}
-              onReturn={handleReturn}
-              onUnreturn={handleUnreturn}
-            />
-          </>
-        )}
-      </main>
+          {view === 'overview' && <Overview dashboard={dashboard} onSelectGroup={goToStock} activeGroup={groupFilter} />}
+
+          {(view === 'stock' || view === 'returned') && (
+            <>
+              {view === 'stock' && (
+                <section className="toolbar">
+                  <select value={company} onChange={(e) => setCompany(e.target.value)}>
+                    <option value="">All companies</option>
+                    {companies.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </select>
+                  {search && (
+                    <button className="chip" onClick={() => setSearch('')}>
+                      Search: {search} ✕
+                    </button>
+                  )}
+                  {groupFilter && (
+                    <button className="chip" onClick={() => setGroupFilter('')}>
+                      Group: {groupFilter} ✕
+                    </button>
+                  )}
+                </section>
+              )}
+
+              <MedicineTable
+                items={items}
+                loading={loading}
+                mode={view === 'stock' ? 'active' : 'returned'}
+                onReturn={handleReturn}
+                onUnreturn={handleUnreturn}
+              />
+            </>
+          )}
+        </main>
+      </div>
 
       {showAdd && (
         <QuickAddModal

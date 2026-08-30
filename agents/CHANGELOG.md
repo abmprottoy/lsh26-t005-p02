@@ -2,6 +2,16 @@
 
 Chronological log of changes made to this project. Newest first.
 
+## 2026-08-30 (ERP-style polish — top navbar, refined sidebar & cards)
+
+- Added a proper **top navbar** (`Topbar.tsx`): breadcrumb (MediTrack / current section), a global search box that jumps to Stock and filters as you type, today's date, a notification bell with a dot when items are expired, and a profile menu (avatar, name/role, dropdown) — click-outside-to-close.
+- Sidebar: added a "Workspace" section label above the nav for a more structured, ERP-like grouping.
+- Overview cards now carry a per-group icon (alert / clock / calendar / check) in a tinted chip, and the risk banner shows a secondary stat (total active SKUs tracked) alongside the taka figure.
+- Table: sticky header so column names stay visible on scroll, a "Showing N items" footer, tighter row/column spacing.
+- Switched body font to Inter (Google Fonts, with system-font fallback) and tightened the spacing/radius/shadow scale across the app for a more consistent, "pixel-considered" look.
+- Removed the redundant local search box from the Stock toolbar — search now lives once, in the topbar.
+- Rebuilt and redeployed: https://lsh26-t005-p02-frontend.tahsinhasib.workers.dev
+
 ## 2026-08-30 (UI redesign — sidebar navigation)
 
 - Rebuilt the frontend UI to be more modern and easier to navigate:

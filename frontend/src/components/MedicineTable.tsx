@@ -26,7 +26,7 @@ export function MedicineTable({
 }) {
   return (
     <div className="table-wrap">
-      <table>
+      <table className="sticky-head">
         <thead>
           <tr>
             <th>Medicine</th>
@@ -84,6 +84,11 @@ export function MedicineTable({
           ))}
         </tbody>
       </table>
+      {!loading && items.length > 0 && (
+        <div className="table-footer">
+          Showing {items.length} item{items.length === 1 ? '' : 's'}
+        </div>
+      )}
     </div>
   )
 }
