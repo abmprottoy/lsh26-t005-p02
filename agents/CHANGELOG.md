@@ -2,6 +2,25 @@
 
 Chronological log of changes made to this project. Newest first.
 
+## 2026-08-30 (Shrink date picker + keep it on-screen)
+
+- The portal-based date picker from the previous fix still always anchored `left` to the trigger's own position at a fixed 264px width, so near a screen edge it could render partly or fully off-screen. Added real viewport clamping: `positionPanel()` now measures the actual rendered panel (falling back to an estimate before first paint) and pulls `left`/`top` back in from the right/bottom edge when it would overflow, flipping above the trigger if there's no room below — recalculated on open, month navigation, scroll, and resize.
+- Shrunk the panel itself (264px → 216px wide, smaller nav buttons/cells/fonts) per request.
+- Deployed: https://lsh26-t005-p02-frontend.tahsinhasib.workers.dev
+
+## 2026-08-30 (Fix table header color + date picker clipping)
+
+- Table header/row-hover/footer had gone via `var(--bg)` in the dark-mode pass, which is a noticeably darker gray than the near-white they used before — added a `--surface-alt` token (light: `#f8f9fb`, dark: a shade lighter than `--surface`) and pointed those three at it instead.
+- The date picker "z-index" issue was actually a clipping bug, not a stacking one: `.datepicker-panel` was a normal descendant of the Quick Add modal, which has `overflow-y: auto` — an absolutely positioned child gets clipped by an ancestor's `overflow: auto` regardless of z-index. Rewrote `DatePicker` to render its calendar panel through a React portal into `document.body`, positioned with `position: fixed` from the trigger's `getBoundingClientRect()` (repositioning on scroll/resize while open) — so it now escapes the modal's scroll container entirely instead of getting cut off.
+- Deployed: https://lsh26-t005-p02-frontend.tahsinhasib.workers.dev
+
+## 2026-08-30 (Dark mode, modernized topbar clock, sidebar credit)
+
+- **Dark mode**: full dark palette defined as CSS variable overrides (`@media (prefers-color-scheme: dark)` for system default, `:root[data-theme="dark"]` for an explicit user choice that wins either way) — since the whole design system was already built on CSS custom properties, this mostly just meant defining a second set of values and hunting down a handful of hardcoded hex colors that bypassed the tokens (risk banner, help example callout, table row/header tints, a couple of hover border colors) and pointing them at tokens instead. Toggle button (sun/moon) in the topbar; choice persists in `localStorage` and defaults to the OS preference on first visit. Sidebar keeps its own fixed dark chrome regardless of the app theme (it already looked like this by design).
+- **Topbar clock**: replaced the plain date text with a pill showing the app's current date plus a live-ticking clock (updates every second), in a small icon+text badge instead of bare text.
+- Sidebar brand subtitle changed from "Pharmacy ops" to "By Team Automagic".
+- Deployed: https://lsh26-t005-p02-frontend.tahsinhasib.workers.dev
+
 ## 2026-08-30 (Custom date picker, search moved to Stock page)
 
 - **Custom date picker** (`frontend/src/components/DatePicker.tsx`): replaced the native `<input type="date">` in Quick Add with a proper calendar popup — month navigation, weekday header, today/selected highlighting — styled to match the app's `Dropdown` component instead of relying on the browser's own (inconsistent-looking) date UI.

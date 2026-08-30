@@ -22,6 +22,18 @@ import {
   type Medicine,
 } from './lib/api'
 
+type Theme = 'light' | 'dark'
+
+function getInitialTheme(): Theme {
+  try {
+    const stored = localStorage.getItem('meditrack-theme')
+    if (stored === 'light' || stored === 'dark') return stored
+  } catch {
+    // ignore
+  }
+  return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+}
+
 const PAGE_COPY: Record<View, { title: string; subtitle: string }> = {
   overview: { title: 'Overview', subtitle: 'What is expiring, when, and how much money is at risk.' },
   stock: { title: 'Active stock', subtitle: 'Search, filter, and mark items returned to the distributor.' },
@@ -43,8 +55,18 @@ function App() {
   const [groupFilter, setGroupFilter] = useState<Group | ''>('')
   const [showAdd, setShowAdd] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [theme, setTheme] = useState<Theme>(getInitialTheme)
 
   const status = view === 'returned' ? 'returned' : 'active'
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    try {
+      localStorage.setItem('meditrack-theme', theme)
+    } catch {
+      // ignore
+    }
+  }, [theme])
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(search), 300)
@@ -104,7 +126,13 @@ function App() {
       />
 
       <div className="content-col">
-        <Topbar view={view} today={dashboard?.today ?? '…'} expiredCount={dashboard?.groups.expired.count ?? 0} />
+        <Topbar
+          view={view}
+          today={dashboard?.today ?? '…'}
+          expiredCount={dashboard?.groups.expired.count ?? 0}
+          theme={theme}
+          onToggleTheme={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
+        />
 
         <main className="main">
           <header className="page-header">

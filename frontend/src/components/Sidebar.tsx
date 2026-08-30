@@ -59,7 +59,7 @@ export function Sidebar({
           </span>
           <div>
             <div className="brand-name">MediTrack</div>
-            <div className="brand-sub">Pharmacy ops</div>
+            <div className="brand-sub">By Team Automagic</div>
           </div>
         </div>
 
