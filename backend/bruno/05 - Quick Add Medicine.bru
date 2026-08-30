@@ -1,0 +1,26 @@
+meta {
+  name: 05 - Quick Add Medicine
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/medicines
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Test Med 500",
+    "company": "Test Co",
+    "batch": "T0001",
+    "quantity": 100,
+    "unit_price_bdt": 12.5,
+    "expiry": "2027-06-01"
+  }
+}
+
+vars:pre-request {
+  baseUrl: localhost:8787
+}

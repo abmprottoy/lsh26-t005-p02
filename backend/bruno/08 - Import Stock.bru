@@ -1,0 +1,50 @@
+meta {
+  name: 08 - Import Stock
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/api/import
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "today": "2026-08-16",
+    "items": [
+      {
+        "id": "M001",
+        "name": "Napa 500",
+        "company": "Opsonin",
+        "batch": "D5008",
+        "quantity": 149,
+        "unit_price_bdt": "1.00",
+        "expiry": "2028-08-05"
+      },
+      {
+        "id": "M002",
+        "name": "Napa Extra",
+        "company": "ACI",
+        "batch": "E1520",
+        "quantity": 200,
+        "unit_price_bdt": "1.00",
+        "expiry": "2026-08-14"
+      }
+    ],
+    "mark_returned": ["M002"]
+  }
+}
+
+vars:pre-request {
+  baseUrl: localhost:8787
+}
+
+docs {
+  WARNING: this wipes and replaces the entire medicines table with the
+  items given here. "today" is optional — if set, the dashboard/grouping
+  uses it instead of the real date (useful for replaying the judges'
+  test cases from agents/P02_pharmacy_expiry_public.json). Omit "today"
+  to go back to using the real date.
+}

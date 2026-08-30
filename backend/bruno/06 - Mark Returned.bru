@@ -1,0 +1,19 @@
+meta {
+  name: 06 - Mark Returned
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/api/medicines/M001/return
+  body: none
+  auth: none
+}
+
+vars:pre-request {
+  baseUrl: localhost:8787
+}
+
+docs {
+  Replace M001 in the URL with the id of the medicine to mark returned.
+}

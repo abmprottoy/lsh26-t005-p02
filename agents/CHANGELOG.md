@@ -2,6 +2,16 @@
 
 Chronological log of changes made to this project. Newest first.
 
+## 2026-08-30 (UI redesign — sidebar navigation)
+
+- Rebuilt the frontend UI to be more modern and easier to navigate:
+  - Added a persistent left **sidebar** (`frontend/src/components/Sidebar.tsx`) with three sections — Overview, Stock, Returned — plus a live backend-connection indicator and an alert badge on Stock showing the expired count.
+  - Split the old single-file dashboard into components: `Overview.tsx` (risk banner, group cards, 6-month chart), `MedicineTable.tsx` (shared table for active/returned views), `QuickAddModal.tsx`, and a small inline icon set (`icons.tsx`, no external icon library).
+  - Clicking a group card on Overview now jumps to Stock pre-filtered to that group.
+  - New visual design: cohesive color system (CSS variables for primary/danger/warn/info), card shadows, rounded corners, a dark sidebar with a green accent, hover states, and a responsive layout that collapses the sidebar to icons-only on narrow screens.
+  - No backend or business-logic changes — same API, same grouping rules.
+- Rebuilt and redeployed frontend: https://lsh26-t005-p02-frontend.tahsinhasib.workers.dev
+
 ## 2026-08-30 (Pharmacy Expiry Shelf Check — P02)
 
 - Implemented the full P02 problem statement, backend + frontend:

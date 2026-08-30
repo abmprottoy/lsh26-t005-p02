@@ -1,0 +1,27 @@
+meta {
+  name: 03 - List Medicines
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/medicines?status=active&search=&company=&group=
+  body: none
+  auth: none
+}
+
+params:query {
+  status: active
+  search: 
+  company: 
+  group: 
+}
+
+vars:pre-request {
+  baseUrl: localhost:8787
+}
+
+docs {
+  status: "active" | "returned" (default: active)
+  group (optional): "expired" | "within30" | "within90" | "safe"
+}

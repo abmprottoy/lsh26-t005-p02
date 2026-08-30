@@ -1,0 +1,19 @@
+meta {
+  name: 07 - Undo Return
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/api/medicines/M001/unreturn
+  body: none
+  auth: none
+}
+
+vars:pre-request {
+  baseUrl: localhost:8787
+}
+
+docs {
+  Replace M001 in the URL with the id of the medicine to undo.
+}

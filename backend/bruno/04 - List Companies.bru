@@ -1,0 +1,15 @@
+meta {
+  name: 04 - List Companies
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/companies
+  body: none
+  auth: none
+}
+
+vars:pre-request {
+  baseUrl: localhost:8787
+}
