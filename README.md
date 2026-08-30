@@ -5,6 +5,19 @@ Monorepo for the hackathon project. Two independent npm projects:
 - `backend/` — [Hono](https://hono.dev) API on Cloudflare Workers, using D1 as the database.
 - `frontend/` — Vite + React (TypeScript).
 
+## Status
+
+- **Backend** deployed: https://backend.tahsinhasib.workers.dev
+  - `GET /` → `Hello Hono!`
+  - `GET /api/health` → `{"status":"ok"}`
+  - D1 database `lsh26-t005-p02-db` bound as `env.DB`, migration `migrations/0001_init.sql` applied both locally and remotely (creates an `items` table)
+  - CORS enabled for all origins
+- **Frontend** deployed: https://lsh26-t005-p02-frontend.tahsinhasib.workers.dev
+  - Calls the backend's `/api/health` on load and shows an online/offline indicator (`src/lib/api.ts`)
+  - Reads `VITE_API_URL` at build time, falling back to the deployed backend URL if unset
+  - Local dev talks to `http://localhost:8787` via `frontend/.env.development.local` (gitignored, not committed — dev-only so it can't leak into a production build)
+- Both deployed as static assets / Workers on Cloudflare (Workers, not the legacy Pages product — `wrangler` redirects `pages deploy` there automatically)
+
 ## Setup
 
 ### Backend
