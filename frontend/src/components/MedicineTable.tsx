@@ -1,4 +1,6 @@
+import { useEffect, useState } from 'react'
 import type { Group, Medicine } from '../lib/api'
+import { IconChevron, IconSpinner } from './icons'
 
 const GROUP_LABEL: Record<Group, string> = {
   expired: 'Expired',
@@ -6,6 +8,8 @@ const GROUP_LABEL: Record<Group, string> = {
   within90: 'Expiring ≤ 90 days',
   safe: 'Safe',
 }
+
+const PAGE_SIZE = 10
 
 function taka(value: number): string {
   return `৳${value.toLocaleString('en-BD', { maximumFractionDigits: 2 })}`
@@ -17,16 +21,39 @@ export function MedicineTable({
   mode,
   onReturn,
   onUnreturn,
+  resetKey,
 }: {
   items: Medicine[]
   loading: boolean
   mode: 'active' | 'returned'
   onReturn?: (id: string) => void
   onUnreturn?: (id: string) => void
+  resetKey?: string
 }) {
+  const [page, setPage] = useState(1)
+
+  useEffect(() => {
+    setPage(1)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resetKey])
+
+  const totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE))
+
+  useEffect(() => {
+    if (page > totalPages) setPage(totalPages)
+  }, [page, totalPages])
+
+  const start = (page - 1) * PAGE_SIZE
+  const pageItems = items.slice(start, start + PAGE_SIZE)
+
   return (
     <div className="table-wrap">
-      <div className="table-scroll">
+      <div className={`table-scroll ${loading ? 'table-scroll-loading' : ''}`}>
+        {loading && (
+          <div className="table-loading-overlay">
+            <IconSpinner size={26} />
+          </div>
+        )}
         <table>
           <thead>
             <tr>
@@ -43,13 +70,6 @@ export function MedicineTable({
             </tr>
           </thead>
           <tbody>
-            {loading && (
-              <tr>
-                <td colSpan={10} className="empty">
-                  Loading…
-                </td>
-              </tr>
-            )}
             {!loading && items.length === 0 && (
               <tr>
                 <td colSpan={10} className="empty">
@@ -57,7 +77,7 @@ export function MedicineTable({
                 </td>
               </tr>
             )}
-            {items.map((item) => (
+            {pageItems.map((item) => (
               <tr key={item.id}>
                 <td className="cell-name">{item.name}</td>
                 <td>{item.company}</td>
@@ -86,9 +106,29 @@ export function MedicineTable({
           </tbody>
         </table>
       </div>
+
       {!loading && items.length > 0 && (
         <div className="table-footer">
-          Showing {items.length} item{items.length === 1 ? '' : 's'}
+          <span>
+            Showing {start + 1}–{Math.min(start + PAGE_SIZE, items.length)} of {items.length} item{items.length === 1 ? '' : 's'}
+          </span>
+          {totalPages > 1 && (
+            <div className="pagination">
+              <button className="pagination-btn" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
+                <span className="icon-flip">
+                  <IconChevron size={13} />
+                </span>
+                Prev
+              </button>
+              <span className="pagination-status">
+                Page {page} of {totalPages}
+              </span>
+              <button className="pagination-btn" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages}>
+                Next
+                <IconChevron size={13} />
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

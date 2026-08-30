@@ -5,6 +5,7 @@ import { Dropdown } from './components/Dropdown'
 import { MedicineTable } from './components/MedicineTable'
 import { Overview } from './components/Overview'
 import { QuickAddModal } from './components/QuickAddModal'
+import { ReportsPage } from './components/ReportsPage'
 import { Sidebar, type View } from './components/Sidebar'
 import { Topbar } from './components/Topbar'
 import { IconPlus } from './components/icons'
@@ -25,6 +26,7 @@ const PAGE_COPY: Record<View, { title: string; subtitle: string }> = {
   stock: { title: 'Active stock', subtitle: 'Search, filter, and mark items returned to the distributor.' },
   returned: { title: 'Returned to distributor', subtitle: 'Items pulled off the shelf and sent back — excluded from active totals.' },
   data: { title: 'Import data', subtitle: 'Load a test file to check the app against it, or reset back to the demo stock list.' },
+  reports: { title: 'Reports', subtitle: 'Generate a print-ready stock expiry report.' },
 }
 
 function App() {
@@ -34,6 +36,7 @@ function App() {
   const [companies, setCompanies] = useState<string[]>([])
   const [view, setView] = useState<View>('overview')
   const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
   const [company, setCompany] = useState('')
   const [groupFilter, setGroupFilter] = useState<Group | ''>('')
   const [showAdd, setShowAdd] = useState(false)
@@ -41,11 +44,16 @@ function App() {
 
   const status = view === 'returned' ? 'returned' : 'active'
 
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search), 300)
+    return () => clearTimeout(t)
+  }, [search])
+
   async function reload() {
     setLoading(true)
     const [db, med, comp] = await Promise.all([
       fetchDashboard(),
-      fetchMedicines({ status, search: search || undefined, company: company || undefined, group: groupFilter || undefined }),
+      fetchMedicines({ status, search: debouncedSearch || undefined, company: company || undefined, group: groupFilter || undefined }),
       fetchCompanies(),
     ])
     setDashboard(db)
@@ -61,7 +69,7 @@ function App() {
   useEffect(() => {
     reload().catch(() => setBackendStatus('offline'))
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status, search, company, groupFilter])
+  }, [status, debouncedSearch, company, groupFilter])
 
   async function handleReturn(id: string) {
     await markReturned(id)
@@ -125,6 +133,8 @@ function App() {
 
           {view === 'data' && <DataTools onChanged={reload} />}
 
+          {view === 'reports' && <ReportsPage />}
+
           {(view === 'stock' || view === 'returned') && (
             <>
               {view === 'stock' && (
@@ -155,6 +165,7 @@ function App() {
                 mode={view === 'stock' ? 'active' : 'returned'}
                 onReturn={handleReturn}
                 onUnreturn={handleUnreturn}
+                resetKey={`${view}|${debouncedSearch}|${company}|${groupFilter}`}
               />
             </>
           )}

@@ -2,6 +2,22 @@
 
 Chronological log of changes made to this project. Newest first.
 
+## 2026-08-30 (Restore horizontal scroll on the stock table)
+
+- The previous fix (fixed per-column widths as percentages summing to 100%) stopped the pagination jump but had a side effect: percentage widths always force the table to fit exactly inside its container, so on narrower screens content was getting truncated (ellipsis) with no way to see the rest. Switched the column widths from percentages to fixed px values (`min-width: 1160px` on the table) — now on wide screens the table still fills the container width, but on narrower ones it holds its columns at their real size and the existing `.table-scroll { overflow: auto }` container scrolls horizontally instead of cutting content off.
+
+## 2026-08-30 (Stabilize table column widths and height across pages)
+
+- Fixed the pagination Prev/Next buttons visibly shifting up/down between pages. Two causes: the table used `table-layout: auto`, so column widths resized per page based on that page's content (e.g. a longer medicine name on page 2 would widen that column and reflow everything); and the last page usually has fewer than 10 rows, so the table itself got shorter, moving the footer up. Fixed both — `table-layout: fixed` with explicit per-column width percentages (plus `text-overflow: ellipsis` so long content truncates instead of overflowing), and a `min-height` on the scroll container sized to a full 10-row page so a short last page just leaves blank space below its rows instead of shrinking the table.
+- Deployed: https://lsh26-t005-p02-frontend.tahsinhasib.workers.dev
+
+## 2026-08-30 (PDF report, table pagination, search spinner)
+
+- **PDF report** (sidebar → Reports, `frontend/src/lib/report.ts`, `jspdf` + `jspdf-autotable`): generates a multi-page, print-ready PDF — header with pharmacy name/date, an executive summary paragraph, a group-breakdown table (color-coded to match the app's badge colors), a top-15 at-risk items table, a value-at-risk-by-company table, a full active stock listing sorted by expiry on its own page, and page-number footers on every page. Downloads client-side via `doc.save()`, no backend involved. Uses "Tk" instead of "৳" in the PDF since jsPDF's built-in fonts don't render the Bengali taka glyph. The library is dynamically `import()`-ed only when the download button is clicked, so its ~430KB doesn't load on every page — kept the main bundle at its previous size.
+- **Table pagination**: `MedicineTable` now paginates client-side at 10 rows/page (Prev/Next + "Page X of Y", "Showing A–B of N items"). Page resets to 1 whenever the active filters (search/company/group/tab) change, via a `resetKey` prop from `App.tsx`, so it doesn't reset on unrelated updates like marking an item returned.
+- **Search spinner + debounce**: typing in the topbar search no longer fires a request per keystroke — it's debounced 300ms before triggering the fetch. While a fetch is in flight, the table shows a centered spinner over the existing (dimmed, non-interactive) rows instead of blanking the table, so filtering feels like a smooth transition rather than a flash of "Loading…".
+- Deployed: https://lsh26-t005-p02-frontend.tahsinhasib.workers.dev
+
 ## 2026-08-30 (Fix icon/label spacing in the Import data tab)
 
 - The mobile bottom tab bar centered each tab's content vertically (`justify-content: center`). "Import data" is the only two-word label, so it wraps to 2 lines while the others (Overview, Stock, Returned) stay on 1 — centering meant its icon sat at a different height than the other tabs' icons, reading as inconsistent icon/label spacing. Switched to `justify-content: flex-start` with fixed top padding so every tab's icon aligns to the same position regardless of how many lines its label wraps to. Also added `flex-shrink: 0` on nav icons generally so they can't get squeezed.

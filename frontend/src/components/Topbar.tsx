@@ -7,6 +7,7 @@ const VIEW_LABEL: Record<View, string> = {
   stock: 'Stock',
   returned: 'Returned',
   data: 'Import data',
+  reports: 'Reports',
 }
 
 export function Topbar({

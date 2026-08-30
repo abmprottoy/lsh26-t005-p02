@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
-import { IconAlert, IconBox, IconGrid, IconPill, IconUndo, IconUpload } from './icons'
+import { IconAlert, IconBox, IconGrid, IconPill, IconReport, IconUndo, IconUpload } from './icons'
 
-export type View = 'overview' | 'stock' | 'returned' | 'data'
+export type View = 'overview' | 'stock' | 'returned' | 'data' | 'reports'
 
 export function Sidebar({
   view,
@@ -22,7 +22,10 @@ export function Sidebar({
     { key: 'returned', label: 'Returned', icon: <IconUndo />, badge: returnedCount || undefined },
   ]
 
-  const toolItems: { key: View; label: string; icon: ReactNode }[] = [{ key: 'data', label: 'Import data', icon: <IconUpload /> }]
+  const toolItems: { key: View; label: string; icon: ReactNode }[] = [
+    { key: 'data', label: 'Import data', icon: <IconUpload /> },
+    { key: 'reports', label: 'Reports', icon: <IconReport /> },
+  ]
 
   function renderItem(item: { key: View; label: string; icon: ReactNode; badge?: number }) {
     return (
