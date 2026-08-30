@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { addMedicine } from '../lib/api'
+import { Dropdown } from './Dropdown'
 
 const SHELF_LIFE_PRESETS = [
   { label: '6 months', days: 182 },
@@ -73,13 +74,11 @@ export function QuickAddModal({ onClose, onAdded }: { onClose: () => void; onAdd
         </div>
         <label>
           Shelf life
-          <select value={shelfLife} onChange={(e) => handleShelfLifeChange(Number(e.target.value))}>
-            {SHELF_LIFE_PRESETS.map((p) => (
-              <option key={p.days} value={p.days}>
-                {p.label}
-              </option>
-            ))}
-          </select>
+          <Dropdown
+            value={String(shelfLife)}
+            onChange={(v) => handleShelfLifeChange(Number(v))}
+            options={SHELF_LIFE_PRESETS.map((p) => ({ value: String(p.days), label: p.label }))}
+          />
         </label>
         <label>
           Expiry date

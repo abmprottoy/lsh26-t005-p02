@@ -2,6 +2,36 @@
 
 Chronological log of changes made to this project. Newest first.
 
+## 2026-08-30 (Fix icon/label spacing in the Import data tab)
+
+- The mobile bottom tab bar centered each tab's content vertically (`justify-content: center`). "Import data" is the only two-word label, so it wraps to 2 lines while the others (Overview, Stock, Returned) stay on 1 — centering meant its icon sat at a different height than the other tabs' icons, reading as inconsistent icon/label spacing. Switched to `justify-content: flex-start` with fixed top padding so every tab's icon aligns to the same position regardless of how many lines its label wraps to. Also added `flex-shrink: 0` on nav icons generally so they can't get squeezed.
+
+## 2026-08-30 (Bottom tab bar on mobile)
+
+- Sidebar navigation now becomes a fixed bottom tab bar on mobile (≤820px) instead of a horizontal strip at the top: `position: fixed; bottom: 0` with icon-over-label buttons, evenly spaced. Brand and the backend-status footer are hidden at that width (no room); the two nav groups (Workspace / Tools) collapse into one row of 4 tabs via `display: contents`.
+- `.content-col` gets bottom padding at that breakpoint so page content (especially the last table rows) doesn't sit underneath the fixed bar; respects `env(safe-area-inset-bottom)` for phones with a home-indicator.
+
+## 2026-08-30 (Mobile responsive fixes)
+
+- Fixed several things that broke on narrow screens:
+  - `.cards` (the 4 group stat cards) used `grid-template-columns: repeat(auto-fit, minmax(200px, 1fr))` — a 200px hard minimum per card doesn't fit on most phones, which forced the whole page to scroll horizontally. Lowered the minimum and added explicit 2-column / 1-column breakpoints at 560px / 400px.
+  - `.dropdown-menu` had a hardcoded `min-width: 200px`, so on a narrow trigger (e.g. a toolbar filter) the menu could render wider than its trigger and spill past the screen edge. Replaced with a `max-width: calc(100vw - 32px)` cap instead.
+  - `.page-header` and `.risk-banner` didn't wrap, so title+button and the risk figure+SKU-count stat could overflow on small screens. Added `flex-wrap: wrap` and a mobile-only style for `.risk-meta` (drops the side border/margin and left-aligns when it wraps below).
+  - Added a `@media (max-width: 560px)` pass: topbar loses the breadcrumb and the "/" search hint and tightens its padding/gaps, the chart's Y-axis column and bar gaps shrink so 6 months of bars stay legible instead of being crushed, and card/tool-card/main padding is reduced.
+  - Added `overflow-x: hidden` on `html`/`body` as a backstop against any remaining 1–2px overflow.
+- Deployed: https://lsh26-t005-p02-frontend.tahsinhasib.workers.dev
+
+## 2026-08-30 (Custom dropdown component + modal width fix)
+
+- Replaced every native `<select>` (Quick Add's shelf-life picker, the Stock company filter, the Import-data case picker) with a new `Dropdown.tsx` component styled to match the rest of the app — same border/radius/padding as text inputs, a panel that reuses the same look as the Topbar's profile menu (rounded, shadowed, hover states, checkmark on the selected item), click-outside and Escape to close. Native selects render with browser/OS chrome that can't be fully styled and don't match the app's design system, which is what was reported as looking off.
+- Fixed the Quick Add modal: inputs didn't have an explicit `width: 100%`, so on some rendering paths they didn't fill their label the same way the dropdown now does, reading as uneven padding. Made both explicit and consistent.
+
+## 2026-08-30 (Table alignment fix + chart axes)
+
+- Fixed the stock table: the sticky-header CSS trick from the earlier redesign (`display: table` on `thead`/each `tbody tr` separately) let each row compute its own column widths independently, so header and body columns didn't line up — that's what looked like inconsistent padding. Replaced it with a normal `<table>` inside a `.table-scroll` container (`overflow: auto; max-height`) and native `position: sticky` on `th`, which keeps one shared column layout. Also evened out edge padding (first/last cell get extra side padding so the grid isn't flush against the card border).
+- Removed the `max-width: 1180px` cap on `.main` — the table/cards now use the full available width next to the sidebar instead of stopping short on wide screens.
+- Chart ("value at risk, next 6 months") now has real axes: a Y-axis with 5 taka-value ticks (compact format, e.g. ৳21.3k) and dashed gridlines, plus the existing month labels turned into a proper X-axis row, with "Month" and "Value (৳)" axis titles. Previously it was bars with no scale reference at all.
+
 ## 2026-08-30 (Import-data feature)
 
 - New sidebar page **Import data** (`frontend/src/components/DataTools.tsx`) so test files can be loaded through the UI instead of curl/Bruno:

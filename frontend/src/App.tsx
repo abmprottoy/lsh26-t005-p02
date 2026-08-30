@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import './App.css'
 import { DataTools } from './components/DataTools'
+import { Dropdown } from './components/Dropdown'
 import { MedicineTable } from './components/MedicineTable'
 import { Overview } from './components/Overview'
 import { QuickAddModal } from './components/QuickAddModal'
@@ -128,14 +129,13 @@ function App() {
             <>
               {view === 'stock' && (
                 <section className="toolbar">
-                  <select value={company} onChange={(e) => setCompany(e.target.value)}>
-                    <option value="">All companies</option>
-                    {companies.map((c) => (
-                      <option key={c} value={c}>
-                        {c}
-                      </option>
-                    ))}
-                  </select>
+                  <Dropdown
+                    className="dropdown-toolbar"
+                    value={company}
+                    onChange={setCompany}
+                    placeholder="All companies"
+                    options={[{ value: '', label: 'All companies' }, ...companies.map((c) => ({ value: c, label: c }))]}
+                  />
                   {search && (
                     <button className="chip" onClick={() => setSearch('')}>
                       Search: {search} ✕

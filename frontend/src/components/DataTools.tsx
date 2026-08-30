@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { importCase, resetDemoData, type ImportCase } from '../lib/api'
+import { Dropdown } from './Dropdown'
 import { IconAlert, IconCheck, IconFile, IconRefresh, IconUpload } from './icons'
 
 type ParsedFile = {
@@ -133,14 +134,16 @@ export function DataTools({ onChanged }: { onChanged: () => void }) {
             {parsed.cases.length > 1 && (
               <label className="import-case-picker">
                 Case to import
-                <select value={selectedIndex} onChange={(e) => setSelectedIndex(Number(e.target.value))}>
-                  {parsed.cases.map((c, i) => (
-                    <option key={c.case_id ?? i} value={i}>
-                      {c.case_id ?? `Case ${i + 1}`} — today {c.today ?? 'real date'} — {c.items.length} items
-                      {c.mark_returned?.length ? `, ${c.mark_returned.length} returned` : ''}
-                    </option>
-                  ))}
-                </select>
+                <Dropdown
+                  value={String(selectedIndex)}
+                  onChange={(v) => setSelectedIndex(Number(v))}
+                  options={parsed.cases.map((c, i) => ({
+                    value: String(i),
+                    label: `${c.case_id ?? `Case ${i + 1}`} — today ${c.today ?? 'real date'} — ${c.items.length} items${
+                      c.mark_returned?.length ? `, ${c.mark_returned.length} returned` : ''
+                    }`,
+                  }))}
+                />
               </label>
             )}
 

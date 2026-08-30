@@ -20,6 +20,14 @@ function taka(value: number): string {
   return `৳${value.toLocaleString('en-BD', { maximumFractionDigits: 2 })}`
 }
 
+function takaCompact(value: number): string {
+  if (value >= 100_000) return `৳${(value / 100_000).toFixed(1)}L`
+  if (value >= 1_000) return `৳${(value / 1_000).toFixed(1)}k`
+  return `৳${Math.round(value)}`
+}
+
+const Y_TICKS = [1, 0.75, 0.5, 0.25, 0]
+
 export function Overview({
   dashboard,
   onSelectGroup,
@@ -85,15 +93,45 @@ export function Overview({
           <h2>Value at risk, next 6 months</h2>
           <span className="chart-hint">Excludes already-expired stock</span>
         </div>
-        <div className="chart-bars">
-          {dashboard?.chart.map((c) => (
-            <div className="chart-bar-wrap" key={c.month}>
-              <span className="chart-value">{taka(c.value)}</span>
-              <div className="chart-bar" style={{ height: `${Math.max(2, (c.value / maxChartValue) * 100)}%` }} title={taka(c.value)} />
-              <span className="chart-label">{c.month}</span>
+
+        <div className="chart-body">
+          <span className="chart-axis-title chart-axis-title-y">Value (৳)</span>
+          <div className="chart-yaxis">
+            {Y_TICKS.map((frac) => (
+              <span key={frac}>{takaCompact(maxChartValue * frac)}</span>
+            ))}
+          </div>
+
+          <div className="chart-plot">
+            <div className="chart-gridlines">
+              {Y_TICKS.map((frac) => (
+                <div className="chart-gridline" key={frac} />
+              ))}
             </div>
-          ))}
+            <div className="chart-bars">
+              {dashboard?.chart.map((c) => (
+                <div className="chart-bar-wrap" key={c.month}>
+                  <span className="chart-value">{takaCompact(c.value)}</span>
+                  <div
+                    className="chart-bar"
+                    style={{ height: `${Math.max(1.5, (c.value / maxChartValue) * 100)}%` }}
+                    title={`${c.month}: ${taka(c.value)}`}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
+
+        <div className="chart-xaxis">
+          <div className="chart-xaxis-spacer" />
+          <div className="chart-xaxis-labels">
+            {dashboard?.chart.map((c) => (
+              <span key={c.month}>{c.month}</span>
+            ))}
+          </div>
+        </div>
+        <div className="chart-axis-title chart-axis-title-x">Month</div>
       </section>
     </>
   )
