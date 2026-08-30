@@ -706,6 +706,139 @@ button {
   color: var(--text-faint);
 }
 
+/* ---- data tools ---- */
+
+.data-tools {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 640px;
+}
+
+.tool-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.tool-card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.tool-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--info-soft);
+  color: var(--info);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.tool-icon-primary {
+  background: var(--primary-soft);
+  color: var(--primary-dark);
+}
+
+.tool-card-head h2 {
+  margin: 0 0 4px;
+  font-size: 0.98rem;
+  font-weight: 700;
+}
+
+.tool-card-head p {
+  margin: 0;
+  font-size: 0.83rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.tool-card-head code {
+  background: var(--bg);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 0.82em;
+}
+
+.import-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.import-preview-file {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.import-case-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.import-case-picker select {
+  width: 100%;
+}
+
+.import-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.import-summary strong {
+  color: var(--text);
+}
+
+.tool-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.tool-alert-warn {
+  background: var(--warn-soft);
+  color: #8a5c0a;
+}
+
+.tool-alert-error {
+  background: var(--danger-soft);
+  color: var(--danger-dark);
+}
+
+.tool-alert-success {
+  background: var(--primary-soft);
+  color: var(--primary-dark);
+}
+
 /* ---- toolbar ---- */
 
 .toolbar {

@@ -18,3 +18,4 @@ Requests, in a sensible order to click through:
 6. Mark Returned
 7. Undo Return
 8. Import Stock — wipes and replaces the whole stock list; use to replay a case from `agents/P02_pharmacy_expiry_public.json`
+9. Reset Demo Data — restores the original 46-item demo stock list

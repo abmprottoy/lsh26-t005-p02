@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
+import { demoItemsAsOf } from './lib/demoData'
 import { daysLeft, groupFor, todayISO } from './lib/grouping'
 
 type Bindings = {
@@ -160,50 +161,66 @@ app.post('/api/medicines/:id/unreturn', async (c) => {
   return c.json({ ok: true })
 })
 
+type ImportItem = {
+  id: string
+  name: string
+  company: string
+  batch: string
+  quantity: number
+  unit_price_bdt: string | number
+  expiry: string
+}
+
+async function replaceStock(db: D1Database, items: ImportItem[], markReturnedIds: string[], todayOverride?: string) {
+  await db.prepare('DELETE FROM medicines').run()
+
+  const returnedSet = new Set(markReturnedIds)
+  const statements = items.map((item) =>
+    db
+      .prepare(
+        'INSERT INTO medicines (id, name, company, batch, quantity, unit_price_bdt, expiry, returned, returned_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+      )
+      .bind(
+        item.id,
+        item.name,
+        item.company,
+        item.batch,
+        item.quantity,
+        Number(item.unit_price_bdt),
+        item.expiry,
+        returnedSet.has(item.id) ? 1 : 0,
+        returnedSet.has(item.id) ? new Date().toISOString() : null
+      )
+  )
+  if (statements.length) await db.batch(statements)
+
+  if (todayOverride) {
+    await db
+      .prepare('INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value')
+      .bind('today_override', todayOverride)
+      .run()
+  } else {
+    await db.prepare('DELETE FROM settings WHERE key = ?').bind('today_override').run()
+  }
+}
+
 app.post('/api/import', async (c) => {
   const body = await c.req.json<{
     today?: string
-    items: {
-      id: string
-      name: string
-      company: string
-      batch: string
-      quantity: number
-      unit_price_bdt: string | number
-      expiry: string
-    }[]
+    items: ImportItem[]
     mark_returned?: string[]
   }>()
 
-  await c.env.DB.prepare('DELETE FROM medicines').run()
-
-  const returnedSet = new Set(body.mark_returned || [])
-  const statements = body.items.map((item) =>
-    c.env.DB.prepare(
-      'INSERT INTO medicines (id, name, company, batch, quantity, unit_price_bdt, expiry, returned, returned_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
-    ).bind(
-      item.id,
-      item.name,
-      item.company,
-      item.batch,
-      item.quantity,
-      Number(item.unit_price_bdt),
-      item.expiry,
-      returnedSet.has(item.id) ? 1 : 0,
-      returnedSet.has(item.id) ? new Date().toISOString() : null
-    )
-  )
-  if (statements.length) await c.env.DB.batch(statements)
-
-  if (body.today) {
-    await c.env.DB.prepare('INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value')
-      .bind('today_override', body.today)
-      .run()
-  } else {
-    await c.env.DB.prepare('DELETE FROM settings WHERE key = ?').bind('today_override').run()
-  }
+  await replaceStock(c.env.DB, body.items, body.mark_returned || [], body.today)
 
   return c.json({ ok: true, imported: body.items.length })
+})
+
+app.post('/api/demo/reset', async (c) => {
+  const today = todayISO()
+  const items = demoItemsAsOf(today)
+  await replaceStock(c.env.DB, items, [])
+  return c.json({ ok: true, imported: items.length })
 })
 
 export default app

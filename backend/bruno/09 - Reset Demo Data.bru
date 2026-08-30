@@ -1,0 +1,17 @@
+meta {
+  name: 09 - Reset Demo Data
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/api/demo/reset
+  body: none
+  auth: none
+}
+
+docs {
+  Wipes and replaces the stock list with the original 46-item demo
+  data, dated relative to today (clears any "today" override too).
+  Same thing the "Reset to demo data" button does in the app.
+}

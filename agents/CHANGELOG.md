@@ -2,6 +2,18 @@
 
 Chronological log of changes made to this project. Newest first.
 
+## 2026-08-30 (Import-data feature)
+
+- New sidebar page **Import data** (`frontend/src/components/DataTools.tsx`) so test files can be loaded through the UI instead of curl/Bruno:
+  - Browse for a local `.json` file. Accepts either the judges' multi-case format (`{ "cases": [...] }`, e.g. `agents/P02_pharmacy_expiry_public.json`) or a single case object (`{ "today"?, "items": [...], "mark_returned"? }`). Parsing and format validation happen client-side before anything is sent to the backend.
+  - If the file has multiple cases, a dropdown lists each one (case id, its "today" date, item/returned counts) to pick from before importing.
+  - "Reset to demo data" button restores the original 46-item seed list, so a judge/test import can always be undone.
+  - Both actions call the existing `/api/import` endpoint (unchanged) plus a new `POST /api/demo/reset` endpoint.
+- Backend: `backend/src/lib/demoData.ts` mirrors `backend/seed.sql` as a TS array with day-offsets from today (verified to produce byte-identical dashboard totals to the SQL seed — 6/11/9/20 across the four groups). `/api/demo/reset` computes expiry dates from the real current date and reuses the same `replaceStock()` helper that `/api/import` uses (deduplicated from what was inline code before).
+- Added a `09 - Reset Demo Data` request to the Bruno collection.
+- Verified end-to-end: imported PUB-01 from the judges' file through the live endpoint (47 items, correct group split), then reset back to demo data (46 items) — both on local and deployed backend.
+- Deployed: https://backend.tahsinhasib.workers.dev and https://lsh26-t005-p02-frontend.tahsinhasib.workers.dev
+
 ## 2026-08-30 (ERP-style polish — top navbar, refined sidebar & cards)
 
 - Added a proper **top navbar** (`Topbar.tsx`): breadcrumb (MediTrack / current section), a global search box that jumps to Stock and filters as you type, today's date, a notification bell with a dot when items are expired, and a profile menu (avatar, name/role, dropdown) — click-outside-to-close.

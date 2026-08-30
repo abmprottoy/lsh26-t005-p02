@@ -87,3 +87,34 @@ export async function addMedicine(input: {
     body: JSON.stringify(input),
   })
 }
+
+export type ImportItem = {
+  id: string
+  name: string
+  company: string
+  batch: string
+  quantity: number
+  unit_price_bdt: string | number
+  expiry: string
+}
+
+export type ImportCase = {
+  case_id?: string
+  today?: string
+  items: ImportItem[]
+  mark_returned?: string[]
+}
+
+export async function importCase(input: ImportCase): Promise<{ ok: boolean; imported: number }> {
+  return json(
+    await fetch(`${API_URL}/api/import`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    })
+  )
+}
+
+export async function resetDemoData(): Promise<{ ok: boolean; imported: number }> {
+  return json(await fetch(`${API_URL}/api/demo/reset`, { method: 'POST' }))
+}

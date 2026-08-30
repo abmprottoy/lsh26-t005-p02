@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
-import { IconAlert, IconBox, IconGrid, IconPill, IconUndo } from './icons'
+import { IconAlert, IconBox, IconGrid, IconPill, IconUndo, IconUpload } from './icons'
 
-export type View = 'overview' | 'stock' | 'returned'
+export type View = 'overview' | 'stock' | 'returned' | 'data'
 
 export function Sidebar({
   view,
@@ -16,11 +16,34 @@ export function Sidebar({
   expiredCount: number
   returnedCount: number
 }) {
-  const items: { key: View; label: string; icon: ReactNode; badge?: number }[] = [
+  const workspaceItems: { key: View; label: string; icon: ReactNode; badge?: number }[] = [
     { key: 'overview', label: 'Overview', icon: <IconGrid /> },
     { key: 'stock', label: 'Stock', icon: <IconBox />, badge: expiredCount || undefined },
     { key: 'returned', label: 'Returned', icon: <IconUndo />, badge: returnedCount || undefined },
   ]
+
+  const toolItems: { key: View; label: string; icon: ReactNode }[] = [{ key: 'data', label: 'Import data', icon: <IconUpload /> }]
+
+  function renderItem(item: { key: View; label: string; icon: ReactNode; badge?: number }) {
+    return (
+      <button
+        key={item.key}
+        className={`nav-item ${view === item.key ? 'nav-item-active' : ''}`}
+        onClick={() => onNavigate(item.key)}
+      >
+        {item.icon}
+        <span>{item.label}</span>
+        {item.key === 'stock' && item.badge ? (
+          <span className="nav-badge nav-badge-alert">
+            <IconAlert size={11} />
+            {item.badge}
+          </span>
+        ) : item.badge ? (
+          <span className="nav-badge">{item.badge}</span>
+        ) : null}
+      </button>
+    )
+  }
 
   return (
     <aside className="sidebar">
@@ -36,26 +59,12 @@ export function Sidebar({
 
       <div className="nav-group">
         <div className="nav-group-label">Workspace</div>
-        <nav className="nav">
-          {items.map((item) => (
-            <button
-              key={item.key}
-              className={`nav-item ${view === item.key ? 'nav-item-active' : ''}`}
-              onClick={() => onNavigate(item.key)}
-            >
-              {item.icon}
-              <span>{item.label}</span>
-              {item.key === 'stock' && item.badge ? (
-                <span className="nav-badge nav-badge-alert">
-                  <IconAlert size={11} />
-                  {item.badge}
-                </span>
-              ) : item.badge ? (
-                <span className="nav-badge">{item.badge}</span>
-              ) : null}
-            </button>
-          ))}
-        </nav>
+        <nav className="nav">{workspaceItems.map(renderItem)}</nav>
+      </div>
+
+      <div className="nav-group">
+        <div className="nav-group-label">Tools</div>
+        <nav className="nav">{toolItems.map(renderItem)}</nav>
       </div>
 
       <div className="sidebar-footer">

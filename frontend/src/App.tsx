@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import './App.css'
+import { DataTools } from './components/DataTools'
 import { MedicineTable } from './components/MedicineTable'
 import { Overview } from './components/Overview'
 import { QuickAddModal } from './components/QuickAddModal'
@@ -17,6 +18,13 @@ import {
   type Group,
   type Medicine,
 } from './lib/api'
+
+const PAGE_COPY: Record<View, { title: string; subtitle: string }> = {
+  overview: { title: 'Overview', subtitle: 'What is expiring, when, and how much money is at risk.' },
+  stock: { title: 'Active stock', subtitle: 'Search, filter, and mark items returned to the distributor.' },
+  returned: { title: 'Returned to distributor', subtitle: 'Items pulled off the shelf and sent back — excluded from active totals.' },
+  data: { title: 'Import data', subtitle: 'Load a test file to check the app against it, or reset back to the demo stock list.' },
+}
 
 function App() {
   const [backendStatus, setBackendStatus] = useState<'checking' | 'online' | 'offline'>('checking')
@@ -74,13 +82,7 @@ function App() {
     if (value && view === 'overview') setView('stock')
   }
 
-  const pageTitle = view === 'overview' ? 'Overview' : view === 'stock' ? 'Active stock' : 'Returned to distributor'
-  const pageSubtitle =
-    view === 'overview'
-      ? 'What is expiring, when, and how much money is at risk.'
-      : view === 'stock'
-        ? 'Search, filter, and mark items returned to the distributor.'
-        : 'Items pulled off the shelf and sent back — excluded from active totals.'
+  const { title: pageTitle, subtitle: pageSubtitle } = PAGE_COPY[view]
 
   return (
     <div className="shell">
@@ -110,7 +112,7 @@ function App() {
               <h1>{pageTitle}</h1>
               <p className="subtitle">{pageSubtitle}</p>
             </div>
-            {view !== 'overview' && (
+            {(view === 'stock' || view === 'returned') && (
               <button className="primary" onClick={() => setShowAdd(true)}>
                 <IconPlus size={16} />
                 Quick add
@@ -119,6 +121,8 @@ function App() {
           </header>
 
           {view === 'overview' && <Overview dashboard={dashboard} onSelectGroup={goToStock} activeGroup={groupFilter} />}
+
+          {view === 'data' && <DataTools onChanged={reload} />}
 
           {(view === 'stock' || view === 'returned') && (
             <>
