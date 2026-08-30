@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { addMedicine } from '../lib/api'
+import { DatePicker } from './DatePicker'
 import { Dropdown } from './Dropdown'
 
 const SHELF_LIFE_PRESETS = [
@@ -82,7 +83,7 @@ export function QuickAddModal({ onClose, onAdded }: { onClose: () => void; onAdd
         </label>
         <label>
           Expiry date
-          <input required type="date" value={expiry} onChange={(e) => setExpiry(e.target.value)} />
+          <DatePicker value={expiry} onChange={setExpiry} />
         </label>
         <div className="modal-actions">
           <button type="button" className="btn-ghost" onClick={onClose}>

@@ -2,6 +2,12 @@
 
 Chronological log of changes made to this project. Newest first.
 
+## 2026-08-30 (Custom date picker, search moved to Stock page)
+
+- **Custom date picker** (`frontend/src/components/DatePicker.tsx`): replaced the native `<input type="date">` in Quick Add with a proper calendar popup — month navigation, weekday header, today/selected highlighting — styled to match the app's `Dropdown` component instead of relying on the browser's own (inconsistent-looking) date UI.
+- **Search relocated**: removed the global search box from the top navbar entirely and put a search field directly in the Stock page's toolbar, above the table, where it actually filters something. It no longer needs to auto-navigate you to Stock when you start typing, since it now only exists on that page. Topbar is now just breadcrumb + date + notifications + profile.
+- Deployed: https://lsh26-t005-p02-frontend.tahsinhasib.workers.dev
+
 ## 2026-08-30 (Center Help page, add "Try it" buttons)
 
 - Centered the Help & Guide content (`.help-page { margin: 0 auto }`) instead of it sitting flush left on wide screens.

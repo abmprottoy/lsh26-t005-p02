@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { View } from './Sidebar'
-import { IconBell, IconChevronDown, IconSearch, IconUser } from './icons'
+import { IconBell, IconChevronDown, IconUser } from './icons'
 
 const VIEW_LABEL: Record<View, string> = {
   overview: 'Overview',
@@ -11,19 +11,7 @@ const VIEW_LABEL: Record<View, string> = {
   help: 'Help & Guide',
 }
 
-export function Topbar({
-  view,
-  today,
-  expiredCount,
-  searchValue,
-  onSearch,
-}: {
-  view: View
-  today: string
-  expiredCount: number
-  searchValue: string
-  onSearch: (value: string) => void
-}) {
+export function Topbar({ view, today, expiredCount }: { view: View; today: string; expiredCount: number }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
@@ -41,16 +29,6 @@ export function Topbar({
         <span className="breadcrumb-root">MediTrack</span>
         <span className="breadcrumb-sep">/</span>
         <span className="breadcrumb-current">{VIEW_LABEL[view]}</span>
-      </div>
-
-      <div className="topbar-search">
-        <IconSearch size={16} />
-        <input
-          placeholder="Search medicines, batches, companies…"
-          value={searchValue}
-          onChange={(e) => onSearch(e.target.value)}
-        />
-        <kbd>/</kbd>
       </div>
 
       <div className="topbar-right">

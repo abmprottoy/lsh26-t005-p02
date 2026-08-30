@@ -9,7 +9,7 @@ import { QuickAddModal } from './components/QuickAddModal'
 import { ReportsPage } from './components/ReportsPage'
 import { Sidebar, type View } from './components/Sidebar'
 import { Topbar } from './components/Topbar'
-import { IconPlus } from './components/icons'
+import { IconPlus, IconSearch } from './components/icons'
 import {
   checkHealth,
   fetchCompanies,
@@ -88,11 +88,6 @@ function App() {
     setView('stock')
   }
 
-  function handleGlobalSearch(value: string) {
-    setSearch(value)
-    if (value && view === 'overview') setView('stock')
-  }
-
   const { title: pageTitle, subtitle: pageSubtitle } = PAGE_COPY[view]
 
   return (
@@ -109,13 +104,7 @@ function App() {
       />
 
       <div className="content-col">
-        <Topbar
-          view={view}
-          today={dashboard?.today ?? '…'}
-          expiredCount={dashboard?.groups.expired.count ?? 0}
-          searchValue={search}
-          onSearch={handleGlobalSearch}
-        />
+        <Topbar view={view} today={dashboard?.today ?? '…'} expiredCount={dashboard?.groups.expired.count ?? 0} />
 
         <main className="main">
           <header className="page-header">
@@ -143,6 +132,15 @@ function App() {
             <>
               {view === 'stock' && (
                 <section className="toolbar">
+                  <div className="search-field">
+                    <IconSearch size={16} />
+                    <input
+                      className="search"
+                      placeholder="Search by medicine name…"
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                    />
+                  </div>
                   <Dropdown
                     className="dropdown-toolbar"
                     value={company}
@@ -150,11 +148,6 @@ function App() {
                     placeholder="All companies"
                     options={[{ value: '', label: 'All companies' }, ...companies.map((c) => ({ value: c, label: c }))]}
                   />
-                  {search && (
-                    <button className="chip" onClick={() => setSearch('')}>
-                      Search: {search} ✕
-                    </button>
-                  )}
                   {groupFilter && (
                     <button className="chip" onClick={() => setGroupFilter('')}>
                       Group: {groupFilter} ✕
