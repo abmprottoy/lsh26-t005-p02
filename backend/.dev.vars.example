@@ -1,0 +1,6 @@
+# Copy this file to .dev.vars and fill in real values for local dev.
+# .dev.vars is gitignored — never commit real secrets.
+#
+# Example:
+# JWT_SECRET=your-secret-here
+# THIRD_PARTY_API_KEY=your-key-here

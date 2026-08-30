@@ -1,0 +1,17 @@
+{
+    "$schema": "node_modules/wrangler/config-schema.json",
+    "name": "backend",
+    "main": "src/index.ts",
+    "compatibility_date": "2026-08-30",
+    "d1_databases": [
+        {
+            "binding": "DB",
+            "database_name": "lsh26-t005-p02-db",
+            "database_id": "fe491305-c0b2-4c8e-9c92-4e5fc85b6250"
+        }
+    ],
+    "observability": {
+        "enabled": true,
+        "head_sampling_rate": 1
+    }
+}
