@@ -1,5 +1,6 @@
-import { useMemo, type ComponentType } from 'react'
-import type { Dashboard, Group } from '../lib/api'
+import { useEffect, useMemo, useState, type ComponentType } from 'react'
+import { fetchMedicines, type Dashboard, type Group, type Medicine } from '../lib/api'
+import { AreaChart, DonutChart, HorizontalBarChart } from './charts'
 import { IconAlert, IconCalendar, IconCheck, IconClock } from './icons'
 
 const GROUP_LABEL: Record<Group, string> = {
@@ -14,6 +15,13 @@ const GROUP_ICON: Record<Group, ComponentType<{ size?: number }>> = {
   within30: IconClock,
   within90: IconCalendar,
   safe: IconCheck,
+}
+
+const GROUP_COLOR_VAR: Record<Group, string> = {
+  expired: 'var(--danger)',
+  within30: 'var(--warn)',
+  within90: 'var(--info)',
+  safe: 'var(--primary)',
 }
 
 function taka(value: number): string {
@@ -37,6 +45,12 @@ export function Overview({
   onSelectGroup: (g: Group) => void
   activeGroup: Group | ''
 }) {
+  const [items, setItems] = useState<Medicine[]>([])
+
+  useEffect(() => {
+    fetchMedicines({ status: 'active' }).then((res) => setItems(res.items))
+  }, [dashboard?.today, dashboard?.returnedCount])
+
   const totalAtRisk = useMemo(() => {
     if (!dashboard) return 0
     return dashboard.groups.expired.value + dashboard.groups.within30.value
@@ -47,10 +61,36 @@ export function Overview({
     return Object.values(dashboard.groups).reduce((sum, g) => sum + g.count, 0)
   }, [dashboard])
 
+  const totalValue = useMemo(() => {
+    if (!dashboard) return 0
+    return Object.values(dashboard.groups).reduce((sum, g) => sum + g.value, 0)
+  }, [dashboard])
+
   const maxChartValue = useMemo(() => {
     if (!dashboard) return 1
     return Math.max(1, ...dashboard.chart.map((c) => c.value))
   }, [dashboard])
+
+  const donutData = useMemo(() => {
+    if (!dashboard) return []
+    return (['expired', 'within30', 'within90', 'safe'] as Group[]).map((g) => ({
+      label: GROUP_LABEL[g],
+      value: dashboard.groups[g].value,
+      color: GROUP_COLOR_VAR[g],
+    }))
+  }, [dashboard])
+
+  const topCompanies = useMemo(() => {
+    const byCompany = new Map<string, number>()
+    for (const item of items) {
+      if (item.group !== 'expired' && item.group !== 'within30') continue
+      byCompany.set(item.company, (byCompany.get(item.company) ?? 0) + item.value)
+    }
+    return [...byCompany.entries()]
+      .map(([label, value]) => ({ label, value }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 6)
+  }, [items])
 
   return (
     <>
@@ -88,6 +128,40 @@ export function Overview({
         })}
       </section>
 
+      <section className="insights-grid">
+        <div className="chart insight-card">
+          <div className="chart-head">
+            <h2>Stock value composition</h2>
+            <span className="chart-hint">By shelf-check group</span>
+          </div>
+          <div className="donut-row">
+            <DonutChart data={donutData} centerLabel="Total value" centerValue={takaCompact(totalValue)} />
+            <ul className="donut-legend">
+              {donutData.map((d) => (
+                <li key={d.label}>
+                  <span className="legend-dot" style={{ background: d.color }} />
+                  <span className="legend-label">{d.label}</span>
+                  <span className="legend-value">{takaCompact(d.value)}</span>
+                  <span className="legend-pct">{totalValue ? `${((d.value / totalValue) * 100).toFixed(0)}%` : '0%'}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <div className="chart insight-card">
+          <div className="chart-head">
+            <h2>Top companies by value at risk</h2>
+            <span className="chart-hint">Expired + expiring ≤ 30 days</span>
+          </div>
+          {topCompanies.length ? (
+            <HorizontalBarChart data={topCompanies} formatValue={takaCompact} />
+          ) : (
+            <p className="chart-empty">Nothing at risk right now — no expired or soon-to-expire stock.</p>
+          )}
+        </div>
+      </section>
+
       <section className="chart">
         <div className="chart-head">
           <h2>Value at risk, next 6 months</h2>
@@ -108,18 +182,13 @@ export function Overview({
                 <div className="chart-gridline" key={frac} />
               ))}
             </div>
-            <div className="chart-bars">
-              {dashboard?.chart.map((c) => (
-                <div className="chart-bar-wrap" key={c.month}>
-                  <span className="chart-value">{takaCompact(c.value)}</span>
-                  <div
-                    className="chart-bar"
-                    style={{ height: `${Math.max(1.5, (c.value / maxChartValue) * 100)}%` }}
-                    title={`${c.month}: ${taka(c.value)}`}
-                  />
-                </div>
-              ))}
-            </div>
+            {dashboard && (
+              <AreaChart
+                points={dashboard.chart.map((c) => ({ label: c.month, value: c.value }))}
+                max={maxChartValue}
+                formatValue={takaCompact}
+              />
+            )}
           </div>
         </div>
 

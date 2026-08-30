@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { Group, Medicine } from '../lib/api'
-import { IconChevron, IconSpinner } from './icons'
+import { IconChevron, IconRefresh, IconSpinner, IconUndo } from './icons'
 
 const GROUP_LABEL: Record<Group, string> = {
   expired: 'Expired',
@@ -92,11 +92,13 @@ export function MedicineTable({
                 <td className="cell-value">{taka(item.value)}</td>
                 <td>
                   {mode === 'active' ? (
-                    <button className="link" onClick={() => onReturn?.(item.id)}>
+                    <button className="btn-pill btn-pill-primary" onClick={() => onReturn?.(item.id)}>
+                      <IconUndo size={13} />
                       Mark returned
                     </button>
                   ) : (
-                    <button className="link" onClick={() => onUnreturn?.(item.id)}>
+                    <button className="btn-pill btn-pill-ghost" onClick={() => onUnreturn?.(item.id)}>
+                      <IconRefresh size={13} />
                       Undo
                     </button>
                   )}

@@ -2,6 +2,38 @@
 
 Chronological log of changes made to this project. Newest first.
 
+## 2026-08-30 (Mark returned / Undo as styled pill buttons)
+
+- Replaced the plain text-link "Mark returned" / "Undo" action in the stock table with proper pill buttons (`.btn-pill`) — icon + label, tinted background instead of bare text, hover and press states, matching the design system's existing badge/chip color language. "Mark returned" uses the primary green treatment, "Undo" a neutral ghost style.
+- Widened the table's Action column (130px → 175px, table `min-width` 1160px → 1205px) so the button has room without wrapping or clipping.
+- Deployed: https://lsh26-t005-p02-frontend.tahsinhasib.workers.dev
+
+## 2026-08-30 (Fix value labels overlapping the line in the 6-month chart)
+
+- The area chart's value labels were pinned to a fixed row at the top of the plot regardless of where each point actually sat — fine when the bar-chart version had them, but for the line/area chart a high-value month (point near the top) meant the fixed-top label collided with the line and dot right there.
+- Moved label positioning into `AreaChart` itself: each label now anchors to its own point's actual coordinates, flips to sit below the dot when that point is near the top of the chart (so it can't collide with the line), and shifts inward at the first/last point so it doesn't spill past the plot edges.
+- Deployed: https://lsh26-t005-p02-frontend.tahsinhasib.workers.dev
+
+## 2026-08-30 (App-shell layout: fixed sidebar/topbar, scrollable content only)
+
+- Replaced the "sticky sidebar that stretches to match content height" approach with a proper fixed app-shell layout: `.shell` is exactly `height: 100vh; overflow: hidden` (no whole-page scroll), the sidebar fills that height and never moves, the topbar sits above the content as a fixed-height flex row, and only `.main` (the actual page content — cards, charts, table) scrolls internally via `overflow-y: auto`. This is the standard admin-dashboard pattern and is more robust than the previous sticky-positioning trick.
+- Scoped this to desktop only (≥821px) — on mobile the app reverts to normal whole-page scrolling with a sticky topbar and the fixed bottom tab bar, since nested scroll containers behave poorly on mobile browsers (momentum scroll, address-bar show/hide).
+- Deployed: https://lsh26-t005-p02-frontend.tahsinhasib.workers.dev
+
+## 2026-08-30 (Fix sidebar whitespace bug from taller Overview page)
+
+- The sidebar's own box was fixed at `height: 100vh` with `position: sticky`. That's correct as long as the page is one screen tall or less, but the new Overview charts (donut, horizontal bar, area chart) made the page significantly taller than a single viewport — `position: sticky` only keeps an element pinned within its own box's height, so once the page scrolled past that first 100vh, there was simply no sidebar box left to render, leaving blank page background where the dark nav should be (reported as "whitespace below the sidebar" and the right-side content reading as dropped too low relative to it).
+- Split `.sidebar` into an outer box (`min-height: 100vh`, no longer sticky itself — it now stretches via flexbox to match the actual page height, so its dark background always covers the full page) and an inner `.sidebar-inner` wrapper (brand, nav, footer) that carries the `position: sticky; top: 0; height: 100vh` behavior, so the nav still visually stays pinned to the viewport while the page scrolls. Updated the mobile bottom-tab-bar rules to match the new two-layer structure.
+- Deployed: https://lsh26-t005-p02-frontend.tahsinhasib.workers.dev
+
+## 2026-08-30 (Overview: donut, horizontal bar, and area charts)
+
+- Discussed which chart types from a 10-item list would actually fit the pharmacy data before building anything — recommended skipping funnel and radar (no sequential-conversion process or multi-axis comparison in this data, would be decorative) and heatmap/stacked-bar (bigger lift, modest payoff at ~46 SKUs), and building donut + horizontal bar + area/line instead.
+- New `frontend/src/components/charts.tsx`: pure-SVG `DonutChart`, `HorizontalBarChart`, and `AreaChart` — no charting library, theme-aware (uses the app's CSS variables for color), consistent with the existing hand-built bar chart.
+- Overview page gained an "insights" row: a donut chart of stock value composition by group (with a legend showing value + % of total) and a horizontal bar chart of the top 6 companies by value at risk (expired + within-30). Overview now fetches its own active-item list (like the Reports page) to compute the company breakdown, independent of whatever filters are set on the Stock page.
+- Replaced the 6-month "value at risk" bar chart with an area/line chart (filled gradient + line + point markers) on the same axis/gridline scaffolding as before — better conveys a forward trend than discrete bars.
+- Deployed: https://lsh26-t005-p02-frontend.tahsinhasib.workers.dev
+
 ## 2026-08-30 (Restore horizontal scroll on the stock table)
 
 - The previous fix (fixed per-column widths as percentages summing to 100%) stopped the pagination jump but had a side effect: percentage widths always force the table to fit exactly inside its container, so on narrower screens content was getting truncated (ellipsis) with no way to see the rest. Switched the column widths from percentages to fixed px values (`min-width: 1160px` on the table) — now on wide screens the table still fills the container width, but on narrower ones it holds its columns at their real size and the existing `.table-scroll { overflow: auto }` container scrolls horizontally instead of cutting content off.

@@ -50,29 +50,31 @@ export function Sidebar({
 
   return (
     <aside className="sidebar">
-      <div className="brand">
-        <span className="brand-mark">
-          <IconPill size={19} />
-        </span>
-        <div>
-          <div className="brand-name">MediTrack</div>
-          <div className="brand-sub">Pharmacy ops</div>
+      <div className="sidebar-inner">
+        <div className="brand">
+          <span className="brand-mark">
+            <IconPill size={19} />
+          </span>
+          <div>
+            <div className="brand-name">MediTrack</div>
+            <div className="brand-sub">Pharmacy ops</div>
+          </div>
         </div>
-      </div>
 
-      <div className="nav-group">
-        <div className="nav-group-label">Workspace</div>
-        <nav className="nav">{workspaceItems.map(renderItem)}</nav>
-      </div>
+        <div className="nav-group">
+          <div className="nav-group-label">Workspace</div>
+          <nav className="nav">{workspaceItems.map(renderItem)}</nav>
+        </div>
 
-      <div className="nav-group">
-        <div className="nav-group-label">Tools</div>
-        <nav className="nav">{toolItems.map(renderItem)}</nav>
-      </div>
+        <div className="nav-group">
+          <div className="nav-group-label">Tools</div>
+          <nav className="nav">{toolItems.map(renderItem)}</nav>
+        </div>
 
-      <div className="sidebar-footer">
-        <span className={`status-dot status-${backendStatus}`} />
-        <span>{backendStatus === 'checking' ? 'Connecting…' : backendStatus === 'online' ? 'All systems online' : 'Backend offline'}</span>
+        <div className="sidebar-footer">
+          <span className={`status-dot status-${backendStatus}`} />
+          <span>{backendStatus === 'checking' ? 'Connecting…' : backendStatus === 'online' ? 'All systems online' : 'Backend offline'}</span>
+        </div>
       </div>
     </aside>
   )
